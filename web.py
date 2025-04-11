@@ -1,8 +1,24 @@
 import streamlit as st
 from datetime import date, datetime
+import requests
 
-st.set_page_config(page_title="Chatbot Lam Lai", page_icon="💬")
-st.title("💬 Ứng dụng Chatbot với Streamlit")
+def search_duckduckgo(query):
+    res = requests.get("https://api.duckduckgo.com/",
+                       params={"q": query, "format": "json"})
+    data = res.json()
+    return data.get("AbstractText", "Không tìm thấy kết quả trên internet.")
+
+st.set_page_config(page_title="Chatbot By Hoang Bao Lam", page_icon="💬")
+st.title("💬 T1 Chatbot")
+
+if "username" not in st.session_state:
+    st.session_state.username = ""
+
+if not st.session_state.username:
+    st.session_state.username = st.text_input("Nhập tên của bạn để bắt đầu:", "")
+    st.stop()
+
+username = st.session_state.username
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -23,7 +39,7 @@ if prompt := st.chat_input("Nhập tin nhắn..."):
     if you == "":
         robot_brain = "I can't hear you, try again"
     elif "hello" in you.lower():
-        robot_brain = "Hello Lam Lai"
+        robot_brain = f"Hello {username}"
     elif "btvn" in you.lower():
         robot_brain = (
             "1. Toán: Phiếu trên Teams  \n"
@@ -38,9 +54,9 @@ if prompt := st.chat_input("Nhập tin nhắn..."):
         now = datetime.now()
         robot_brain = now.strftime("%H hours %M minutes %S seconds")
     elif "bye" in you.lower():
-        robot_brain = "Bye Lam Lai"
+        robot_brain = f"Bye {username}"
     else:
-        robot_brain = "I'm fine thank you, and you?"
+        robot_brain = search_duckduckgo(you)
 
     with st.chat_message("assistant"):
         st.markdown(robot_brain)
