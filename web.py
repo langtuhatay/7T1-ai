@@ -8,7 +8,7 @@ google_api_key = st.secrets["GOOGLE_API_KEY"]
 google_cx = st.secrets["GOOGLE_CX"]
 
 def google_search(query):
-    url = f"https://www.googleapis.com/customsearch/v1"
+    url = "https://www.googleapis.com/customsearch/v1"
     params = {
         "key": google_api_key,
         "cx": google_cx,
@@ -25,7 +25,7 @@ def ask_openai(question):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": question}],
-            max_tokens=200,
+            max_tokens=500,
             temperature=0.7,
         )
         return response["choices"][0]["message"]["content"].strip()
