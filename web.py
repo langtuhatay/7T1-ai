@@ -2,11 +2,23 @@ import streamlit as st
 from datetime import date, datetime
 import requests
 
-def search_duckduckgo(query):
-    res = requests.get("https://api.duckduckgo.com/",
-                       params={"q": query, "format": "json"})
-    data = res.json()
-    return data.get("AbstractText", "Không tìm thấy kết quả trên internet.")
+def search_google(query):
+    api_key = "AIzaSyDnnV9u4j_zd9l4lSvdfDvIiPqRAptgB8k"
+    cse_id = "0630ed22646084969"
+    url = "https://www.googleapis.com/customsearch/v1"
+
+    params = {
+        "key": api_key,
+        "cx": cse_id,
+        "q": query,
+    }
+
+    response = requests.get(url, params=params)
+    results = response.json()
+    try:
+        return results["items"][0]["snippet"]
+    except (KeyError, IndexError):
+        return "Không tìm thấy kết quả."
 
 st.set_page_config(page_title="Chatbot By Hoang Bao Lam", page_icon="💬")
 st.title("💬 T1 Chatbot")
@@ -21,7 +33,6 @@ if not st.session_state.username:
         st.experimental_rerun()
     else:
         st.stop()
-
 
 username = st.session_state.username
 
@@ -61,7 +72,7 @@ if prompt := st.chat_input("Nhập tin nhắn..."):
     elif "bye" in you.lower():
         robot_brain = f"Bye {username}"
     else:
-        robot_brain = search_duckduckgo(you)
+        robot_brain = search_google(you)
 
     with st.chat_message("assistant"):
         st.markdown(robot_brain)
