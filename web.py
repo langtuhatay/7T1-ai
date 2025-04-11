@@ -1,11 +1,8 @@
 import streamlit as st
 from datetime import date, datetime
-import pyttsx3
 
 st.set_page_config(page_title="Chatbot Lam Lai", page_icon="💬")
 st.title("💬 Ứng dụng Chatbot với Streamlit")
-
-robot_mouth = pyttsx3.init()
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -42,6 +39,3 @@ if prompt := st.chat_input("Nhập tin nhắn..."):
         st.markdown(robot_brain)
 
     st.session_state.messages.append({"role": "assistant", "content": robot_brain})
-
-    robot_mouth.say(robot_brain)
-    robot_mouth.runAndWait()
