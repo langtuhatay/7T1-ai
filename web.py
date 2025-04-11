@@ -15,9 +15,14 @@ def search_google(query):
     response = requests.get(url, params=params)
     data = response.json()
     if "items" in data:
-        return data["items"][0]["snippet"]
+        item = data["items"][0]
+        title = item["title"]
+        snippet = item["snippet"]
+        link = item["link"]
+        return f"**{title}**\n\n{snippet}\n\n🔗 [Xem chi tiết]({link})"
     else:
         return "Không tìm thấy kết quả trên internet."
+
 
 st.set_page_config(page_title="Chatbot By Hoang Bao Lam", page_icon="💬")
 st.title("💬 T1 Chatbot")
