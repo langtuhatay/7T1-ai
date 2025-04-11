@@ -1,27 +1,39 @@
 import streamlit as st
 import openai
-from datetime import date, datetime
 import requests
+from datetime import datetime, date
 
-openai.api_key = st.secrets["api_keys"]["openai"]
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+google_api_key = st.secrets["GOOGLE_API_KEY"]
+google_cx = st.secrets["GOOGLE_CX"]
 
-def ask_openai(prompt):
+def google_search(query):
+    url = f"https://www.googleapis.com/customsearch/v1"
+    params = {
+        "key": google_api_key,
+        "cx": google_cx,
+        "q": query
+    }
+    res = requests.get(url, params=params)
+    results = res.json()
+    if "items" in results:
+        return results["items"][0]["snippet"]
+    return "Không tìm thấy kết quả trên internet."
+
+def ask_openai(question):
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Bạn là trợ lý AI thông minh, thân thiện, hiểu tiếng Việt."},
-                {"role": "user", "content": prompt}
-            ],
+            messages=[{"role": "user", "content": question}],
+            max_tokens=200,
             temperature=0.7,
-            max_tokens=1000
         )
-        return response.choices[0].message.content.strip()
+        return response["choices"][0]["message"]["content"].strip()
     except Exception as e:
-        return f"Lỗi: {e}"
+        return f"Lỗi OpenAI: {e}"
 
-st.set_page_config(page_title="Chatbot Thông Minh", page_icon="💬")
-st.title("💬 Chatbot T1 - Trợ lý AI")
+st.set_page_config(page_title="Chatbot By Hoang Bao Lam", page_icon="💬")
+st.title("💬 T1 Chatbot")
 
 if "username" not in st.session_state:
     st.session_state.username = ""
@@ -30,7 +42,7 @@ if not st.session_state.username:
     name_input = st.text_input("Nhập tên của bạn để bắt đầu:")
     if name_input:
         st.session_state.username = name_input
-        st.experimental_rerun()
+        st.rerun()
     else:
         st.stop()
 
@@ -52,9 +64,9 @@ if prompt := st.chat_input("Nhập tin nhắn..."):
     robot_brain = ""
 
     if you == "":
-        robot_brain = "Tôi không nghe thấy gì cả, bạn thử lại nhé!"
+        robot_brain = "Bạn nói nhỏ quá, nói lại nha!"
     elif "hello" in you.lower():
-        robot_brain = f"Xin chào {username}!"
+        robot_brain = f"Hello {username}"
     elif "btvn" in you.lower():
         robot_brain = (
             "1. Toán: Phiếu trên Teams  \n"
@@ -63,15 +75,18 @@ if prompt := st.chat_input("Nhập tin nhắn..."):
             "4. KHTN: Làm hết phần TN trong ĐC"
         )
     elif "today" in you.lower():
-        today = date.today()
-        robot_brain = today.strftime("%d/%m/%Y")
+        robot_brain = date.today().strftime("%B %d, %Y")
     elif "now" in you.lower():
         now = datetime.now()
         robot_brain = now.strftime("%H:%M:%S")
     elif "bye" in you.lower():
-        robot_brain = f"Tạm biệt {username}!"
+        robot_brain = f"Bye {username}"
     else:
-        robot_brain = ask_openai(you)
+        google_result = google_search(you)
+        if google_result == "Không tìm thấy kết quả trên internet.":
+            robot_brain = ask_openai(you)
+        else:
+            robot_brain = google_result
 
     with st.chat_message("assistant"):
         st.markdown(robot_brain)
