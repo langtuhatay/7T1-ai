@@ -25,10 +25,12 @@ if prompt := st.chat_input("Nhập tin nhắn..."):
     elif "hello" in you.lower():
         robot_brain = "Hello Lam Lai"
     elif "btvn" in you.lower():
-        robot_brain = """1. Toán: Phiếu trên Teams
-                         2. Văn: Phiếu trên Teams
-                         3. TA: Làm từ đầu đến Task 7 trang 4 ĐC
-                         4. KHTN: Làm hết phần TN trong ĐC"""
+        robot_brain = (
+            "1. Toán: Phiếu trên Teams  \n"
+            "2. Văn: Phiếu trên Teams  \n"
+            "3. TA: Làm từ đầu đến Task 7 trang 4 ĐC  \n"
+            "4. KHTN: Làm hết phần TN trong ĐC"
+        )
     elif "today" in you.lower():
         today = date.today()
         robot_brain = today.strftime("%B %d, %Y")
