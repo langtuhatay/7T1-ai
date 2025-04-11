@@ -60,35 +60,34 @@ if prompt := st.chat_input("Nhập tin nhắn..."):
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    you = prompt.strip()
-    robot_brain = ""
+    user_input = prompt.strip()
+    response = ""
 
-    if you == "":
-        robot_brain = "Bạn nói nhỏ quá, nói lại nha!"
-    elif "hello" in you.lower():
-        robot_brain = f"Hello {username}"
-    elif "btvn" in you.lower():
-        robot_brain = (
+    if user_input == "":
+        response = "Bạn nói nhỏ quá, nói lại nha!"
+    elif "hello" in user_input.lower():
+        response = f"Hello {username}"
+    elif "btvn" in user_input.lower():
+        response = (
             "1. Toán: Phiếu trên Teams  \n"
             "2. Văn: Phiếu trên Teams  \n"
             "3. TA: Làm từ đầu đến Task 7 trang 4 ĐC  \n"
             "4. KHTN: Làm hết phần TN trong ĐC"
         )
-    elif "today" in you.lower():
-        robot_brain = date.today().strftime("%B %d, %Y")
-    elif "now" in you.lower():
+    elif "today" in user_input.lower():
+        response = date.today().strftime("%B %d, %Y")
+    elif "now" in user_input.lower():
         now = datetime.now()
-        robot_brain = now.strftime("%H:%M:%S")
-    elif "bye" in you.lower():
-        robot_brain = f"Bye {username}"
+        response = now.strftime("%H:%M:%S")
+    elif "bye" in user_input.lower():
+        response = f"Bye {username}"
+    elif user_input.lower().startswith("tìm :"):
+        query = user_input[5:].strip()
+        response = google_search(query)
     else:
-        google_result = google_search(you)
-        if google_result == "Không tìm thấy kết quả trên internet.":
-            robot_brain = ask_openai(you)
-        else:
-            robot_brain = google_result
+        response = ask_openai(user_input)
 
     with st.chat_message("assistant"):
-        st.markdown(robot_brain)
+        st.markdown(response)
 
-    st.session_state.messages.append({"role": "assistant", "content": robot_brain})
+    st.session_state.messages.append({"role": "assistant", "content": response})
