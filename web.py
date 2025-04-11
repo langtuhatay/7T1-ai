@@ -15,8 +15,13 @@ if "username" not in st.session_state:
     st.session_state.username = ""
 
 if not st.session_state.username:
-    st.session_state.username = st.text_input("Nhập tên của bạn để bắt đầu:", "")
-    st.stop()
+    name_input = st.text_input("Nhập tên của bạn để bắt đầu:")
+    if name_input:
+        st.session_state.username = name_input
+        st.experimental_rerun()
+    else:
+        st.stop()
+
 
 username = st.session_state.username
 
