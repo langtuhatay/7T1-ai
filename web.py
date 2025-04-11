@@ -3,7 +3,10 @@ import openai
 import requests
 from datetime import datetime, date
 
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+from openai import OpenAI
+
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
 google_api_key = st.secrets["GOOGLE_API_KEY"]
 google_cx = st.secrets["GOOGLE_CX"]
 
@@ -22,13 +25,13 @@ def google_search(query):
 
 def ask_openai(question):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": question}],
             max_tokens=500,
             temperature=0.7,
         )
-        return response["choices"][0]["message"]["content"].strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         return f"Lỗi OpenAI: {e}"
 
