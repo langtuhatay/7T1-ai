@@ -2,22 +2,22 @@ import streamlit as st
 from datetime import date, datetime
 import requests
 
-GOOGLE_API_KEY = "AIzaSyDnnV9u4j_zd9l4lSvdfDvIiPqRAptgB8k"
-GOOGLE_CSE_ID = "0630ed22646084969"
+API_KEY = "AIzaSyDnnV9u4j_zd9l4lSvdfDvIiPqRAptgB8k"
+CX = "0630ed22646084969"
 
-def google_search(query):
+def search_google(query):
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
-        "key": GOOGLE_API_KEY,
-        "cx": GOOGLE_CSE_ID,
+        "key": API_KEY,
+        "cx": CX,
         "q": query
     }
-    res = requests.get(url, params=params)
-    data = res.json()
-    items = data.get("items", [])
-    if items:
-        return items[0].get("snippet", "Không tìm thấy thông tin.")
-    return "Không tìm thấy kết quả trên Google."
+    response = requests.get(url, params=params)
+    data = response.json()
+    if "items" in data:
+        return data["items"][0]["snippet"]
+    else:
+        return "Không tìm thấy kết quả trên internet."
 
 st.set_page_config(page_title="Chatbot By Hoang Bao Lam", page_icon="💬")
 st.title("💬 T1 Chatbot")
@@ -29,7 +29,7 @@ if not st.session_state.username:
     name_input = st.text_input("Nhập tên của bạn để bắt đầu:")
     if name_input:
         st.session_state.username = name_input
-        st.rerun()
+        st.experimental_rerun()
     else:
         st.stop()
 
@@ -44,6 +44,7 @@ for msg in st.session_state.messages:
 
 if prompt := st.chat_input("Nhập tin nhắn..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
+
     with st.chat_message("user"):
         st.markdown(prompt)
 
@@ -70,7 +71,7 @@ if prompt := st.chat_input("Nhập tin nhắn..."):
     elif "bye" in you.lower():
         robot_brain = f"Bye {username}"
     else:
-        robot_brain = google_search(you)
+        robot_brain = search_google(you)
 
     with st.chat_message("assistant"):
         st.markdown(robot_brain)
